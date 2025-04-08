@@ -2,6 +2,8 @@
 using Microsoft.IdentityModel.Tokens;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.DTOs;
+using ReleaseManagerIdentityApi.Models.DTOs.Requests;
+using ReleaseManagerIdentityApi.Models.DTOs.Responses;
 using ReleaseManagerIdentityApi.Models.Entities;
 using System.Security.Claims;
 using System.Security.Cryptography;

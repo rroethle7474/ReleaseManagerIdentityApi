@@ -1,4 +1,5 @@
-﻿using ReleaseManagerIdentityApi.Models.DTOs;
+﻿using ReleaseManagerIdentityApi.Models.DTOs.Requests;
+using ReleaseManagerIdentityApi.Models.DTOs.Responses;
 
 namespace ReleaseManagerIdentityApi.Services.Auth
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReleaseManagerIdentityApi.Models.DTOs
+namespace ReleaseManagerIdentityApi.Models.DTOs.Requests
 {
     public class RegisterRequest
     {

@@ -1,4 +1,4 @@
-﻿namespace ReleaseManagerIdentityApi.Models.DTOs
+﻿namespace ReleaseManagerIdentityApi.Models.DTOs.Responses
 {
     public class AuthResponse
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using ReleaseManagerIdentityApi.Models.DTOs;
 using ReleaseManagerIdentityApi.Models.DTOs.Requests;
+using ReleaseManagerIdentityApi.Models.DTOs.Responses;
 using ReleaseManagerIdentityApi.Services.Auth;
 
 namespace ReleaseManagerIdentityApi.Controllers
