@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Services.Auth;
+using ReleaseManagerIdentityApi.Services.DevOpsServices;
 using ReleaseManagerIdentityApi.Services.OrganizationService;
 using ReleaseManagerIdentityApi.Services.UserService;
 using System.Text;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
