@@ -3,8 +3,7 @@ using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.DTOs;
 using ReleaseManagerIdentityApi.Models.DTOs.Requests;
 using ReleaseManagerIdentityApi.Models.Entities;
-using System.Security.Cryptography;
-using System.Text;
+using ReleaseManagerIdentityApi.Utilities;
 
 namespace ReleaseManagerIdentityApi.Services.OrganizationService
 {
@@ -107,9 +106,9 @@ namespace ReleaseManagerIdentityApi.Services.OrganizationService
             if (existingUser == null)
             {
                 // Create a new user with invite flag
-                var salt = GenerateSalt();
-                var tempPassword = GenerateRandomPassword();
-                var hashedPassword = HashPassword(tempPassword, salt);
+                var salt = SecurityUtilities.GenerateSalt();
+                var tempPassword = SecurityUtilities.GenerateRandomPassword();
+                var hashedPassword = SecurityUtilities.HashPassword(tempPassword, salt);
 
                 userId = Guid.NewGuid();
                 var user = new User
@@ -166,32 +165,6 @@ namespace ReleaseManagerIdentityApi.Services.OrganizationService
             await _context.SaveChangesAsync();
 
             // TODO: Send invitation email to user
-        }
-
-        private string GenerateSalt()
-        {
-            var randomBytes = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomBytes);
-            return Convert.ToBase64String(randomBytes);
-        }
-
-        private string GenerateRandomPassword()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-            var random = new Random();
-            var password = new string(Enumerable.Repeat(chars, 12)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-
-            return password;
-        }
-
-        private string HashPassword(string password, string salt)
-        {
-            using var sha256 = SHA256.Create();
-            var passwordWithSalt = Encoding.UTF8.GetBytes(password + salt);
-            var hashBytes = sha256.ComputeHash(passwordWithSalt);
-            return Convert.ToBase64String(hashBytes);
         }
     }
 }

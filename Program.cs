@@ -49,7 +49,7 @@ builder.Services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Identity Provider API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Release Manager Identity Provider API", Version = "v1" });
 
     // Add JWT Authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

@@ -1,17 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.Entities;
-using ReleaseManagerIdentityApi.Services.Auth;
-using System;
-using System.Collections.Generic;
+using ReleaseManagerIdentityApi.Utilities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ReleaseManagerIdentityApi.Services.Auth
 {
@@ -60,14 +54,6 @@ namespace ReleaseManagerIdentityApi.Services.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
-
         public async Task<UserToken> CreateUserRefreshTokenAsync(User user)
         {
             // Get the refresh token type ID
@@ -84,7 +70,7 @@ namespace ReleaseManagerIdentityApi.Services.Auth
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
                 TokenTypeId = refreshTokenType.Id,
-                TokenValue = GenerateRefreshToken(),
+                TokenValue = SecurityUtilities.GenerateRefreshToken(),
                 ExpiresOn = DateTime.UtcNow.AddDays(7),
                 CreatedOn = DateTime.UtcNow,
                 CreatedBy = user.Id,

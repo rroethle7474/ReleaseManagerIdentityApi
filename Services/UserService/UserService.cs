@@ -1,8 +1,7 @@
 ﻿using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.DTOs;
 using ReleaseManagerIdentityApi.Models.DTOs.Requests;
-using System.Security.Cryptography;
-using System.Text;
+using ReleaseManagerIdentityApi.Utilities;
 
 namespace ReleaseManagerIdentityApi.Services.UserService
 {
@@ -75,7 +74,7 @@ namespace ReleaseManagerIdentityApi.Services.UserService
             }
 
             // Verify current password
-            var hashedCurrentPassword = HashPassword(request.CurrentPassword, user.PasswordSalt);
+            var hashedCurrentPassword = SecurityUtilities.HashPassword(request.CurrentPassword, user.PasswordSalt);
             if (hashedCurrentPassword != user.Password)
             {
                 throw new InvalidOperationException("Current password is incorrect");
@@ -88,19 +87,11 @@ namespace ReleaseManagerIdentityApi.Services.UserService
             }
 
             // Update password
-            user.Password = HashPassword(request.NewPassword, user.PasswordSalt);
+            user.Password = SecurityUtilities.HashPassword(request.NewPassword, user.PasswordSalt);
             user.UpdatedOn = DateTime.UtcNow;
             user.UpdatedBy = userId;
 
             await _context.SaveChangesAsync();
-        }
-
-        private string HashPassword(string password, string salt)
-        {
-            using var sha256 = SHA256.Create();
-            var passwordWithSalt = Encoding.UTF8.GetBytes(password + salt);
-            var hashBytes = sha256.ComputeHash(passwordWithSalt);
-            return Convert.ToBase64String(hashBytes);
         }
     }
 }
