@@ -17,7 +17,6 @@ namespace ReleaseManagerIdentityApi.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<OrganizationUser> OrganizationUsers { get; set; }
-        public DbSet<DevOpsOrganization> DevOpsOrganizations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,7 +29,6 @@ namespace ReleaseManagerIdentityApi.Data
             modelBuilder.Entity<Role>().ToTable("Role");
             modelBuilder.Entity<UserRole>().ToTable("UserRole");
             modelBuilder.Entity<OrganizationUser>().ToTable("OrganizationUser");
-            modelBuilder.Entity<DevOpsOrganization>().ToTable("DevOpsOrganization");
 
             // Configure relationships
             modelBuilder.Entity<UserToken>()
@@ -68,24 +66,6 @@ namespace ReleaseManagerIdentityApi.Data
                 .WithMany()
                 .HasForeignKey(ou => ou.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<DevOpsOrganization>()
-                .HasOne(d => d.Organization)
-                .WithMany()
-                .HasForeignKey(d => d.OrganizationId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<DevOpsOrganization>()
-                .HasOne(d => d.User)
-                .WithMany()
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            // Configure unique constraint for DevOpsOrganization
-            modelBuilder.Entity<DevOpsOrganization>()
-                .HasIndex(d => new { d.UserId, d.AzureDevOpsOrgIdentifier })
-                .IsUnique()
-                .HasFilter("[UserId] IS NOT NULL AND [AzureDevOpsOrgIdentifier] IS NOT NULL");
         }
     }
 }

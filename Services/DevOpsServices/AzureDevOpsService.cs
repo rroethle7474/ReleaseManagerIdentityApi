@@ -109,30 +109,6 @@ namespace ReleaseManagerIdentityApi.Services.DevOpsServices
                     throw new InvalidOperationException("User is not associated with any organization");
                 }
 
-                // Check if DevOps organization already exists
-                var existingDevOpsOrg = await _context.Set<DevOpsOrganization>()
-                .FirstOrDefaultAsync(d => d.OrganizationId == orgUser.OrganizationId &&
-                                             d.DevOpsOrgName == orgName);
-
-                if (existingDevOpsOrg == null)
-                {
-                    // Create new DevOps organization
-                    var devOpsOrg = new DevOpsOrganization
-                    {
-                        Id = Guid.NewGuid(),
-                        OrganizationId = orgUser.OrganizationId,
-                        DevOpsOrgName = orgName,
-                        UserId = userId,
-                        AzureDevOpsOrgIdentifier = orgName,
-                        CreatedOn = DateTime.UtcNow,
-                        CreatedBy = userId,
-                        UpdatedOn = DateTime.UtcNow,
-                        UpdatedBy = userId
-                    };
-
-                    _context.Set<DevOpsOrganization>().Add(devOpsOrg);
-                }
-
                 // Store the PAT (in a real implementation, consider encrypting this)
                 await StoreAzureDevOpsTokenAsync(
                     userId,
