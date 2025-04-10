@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ReleaseManagerIdentityApi.Models.Entities
 {
     [Table("DevOpsOrganization")]
-    public class DevOpsOrganization
+    public class DevOpsOrganization : BaseEntity
     {
         [Key]
         public Guid Id { get; set; }
@@ -18,15 +18,7 @@ namespace ReleaseManagerIdentityApi.Models.Entities
         public Guid? UserId { get; set; }
 
         [StringLength(200)]
-        public string AzureDevOpsOrgIdentifier { get; set; }
-
-        public DateTime CreatedOn { get; set; }
-
-        public Guid CreatedBy { get; set; }
-
-        public DateTime UpdatedOn { get; set; }
-
-        public Guid UpdatedBy { get; set; }
+        public string? AzureDevOpsOrgIdentifier { get; set; }
 
         [ForeignKey("OrganizationId")]
         public virtual Organization Organization { get; set; }

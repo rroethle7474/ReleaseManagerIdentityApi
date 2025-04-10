@@ -1,5 +1,4 @@
-﻿using ReleaseManagerIdentityApi.Models.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReleaseManagerIdentityApi.Models.Entities
@@ -15,6 +14,6 @@ namespace ReleaseManagerIdentityApi.Models.Entities
         public string Name { get; set; }
 
         [StringLength(400)]
-        public string OrganizationLogo { get; set; }
+        public string? OrganizationLogo { get; set; }
     }
 }

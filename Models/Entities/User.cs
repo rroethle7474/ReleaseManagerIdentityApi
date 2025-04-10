@@ -43,10 +43,10 @@ namespace ReleaseManagerIdentityApi.Models.Entities
         public string LastName { get; set; }
 
         [StringLength(200)]
-        public string AvatarUrl { get; set; }
+        public string? AvatarUrl { get; set; }
 
         [StringLength(100)]
-        public string TimeZone { get; set; }
+        public string? TimeZone { get; set; }
 
         public bool IsInvite { get; set; }
     }

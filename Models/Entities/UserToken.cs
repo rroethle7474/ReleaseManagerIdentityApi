@@ -16,9 +16,10 @@ namespace ReleaseManagerIdentityApi.Models.Entities
         public int TokenTypeId { get; set; }
 
         [Column(TypeName = "varchar(MAX)")]
-        public string TokenValue { get; set; }
+        public string? TokenValue { get; set; }
 
-        public DateTime ExpiresOn { get; set; }
+        [Required]
+        public DateTime ExpiresOn { get; set; } = DateTime.UtcNow.AddDays(7);
 
 
         [ForeignKey("Id")]
