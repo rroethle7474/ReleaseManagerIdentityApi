@@ -1,6 +1,6 @@
 ﻿namespace ReleaseManagerIdentityApi.Models.DTOs.Responses
 {
-    public class AzureDevOpsTokenResponse
+    public class CloudProviderTokenResponse
     {
         public string Token { get; set; }
     }

@@ -10,34 +10,36 @@ namespace ReleaseManagerIdentityApi.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class AzureDevOpsController : ControllerBase
+    public class CloudProviderController : ControllerBase
     {
-        private readonly IAzureDevOpsService _azureDevOpsService;
+        private readonly ICloudProviderService _cloudProviderService;
 
-        public AzureDevOpsController(IAzureDevOpsService azureDevOpsService)
+        public CloudProviderController(ICloudProviderService cloudProviderService)
         {
-            _azureDevOpsService = azureDevOpsService;
+            _cloudProviderService = cloudProviderService;
         }
 
         [HttpPost("connect")]
-        public async Task<IActionResult> ConnectAzureDevOps(ConnectAzureDevOpsRequest request)
+        public async Task<IActionResult> ConnectProvider([FromBody] ConnectCloudProviderRequest request)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-                var result = await _azureDevOpsService.ConnectToAzureDevOpsAsync(
+                var result = await _cloudProviderService.ConnectAsync(
                     userId,
+                    request.CloudProviderId,
                     request.OrganizationName,
-                    request.PersonalAccessToken
+                    request.Token,
+                    request.AuthMethodId
                 );
 
                 if (result)
                 {
-                    return Ok(new { message = "Connected to Azure DevOps organization successfully" });
+                    return Ok(new { message = "Connected to cloud provider successfully" });
                 }
 
-                return BadRequest(new { message = "Failed to connect to Azure DevOps" });
+                return BadRequest(new { message = "Failed to connect to cloud provider" });
             }
             catch (InvalidOperationException ex)
             {
@@ -45,25 +47,25 @@ namespace ReleaseManagerIdentityApi.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, new { message = "An error occurred while connecting to Azure DevOps" });
+                return StatusCode(500, new { message = "An error occurred while connecting to cloud provider" });
             }
         }
 
-        [HttpGet("token")]
-        public async Task<ActionResult<AzureDevOpsTokenResponse>> GetAzureDevOpsToken()
+        [HttpGet("token/{cloudProviderId}")]
+        public async Task<ActionResult<CloudProviderTokenResponse>> GetToken(int cloudProviderId)
         {
             try
             {
                 var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-                var token = await _azureDevOpsService.GetAzureDevOpsTokenAsync(userId);
+                var token = await _cloudProviderService.GetTokenAsync(userId, cloudProviderId);
 
                 if (string.IsNullOrEmpty(token))
                 {
-                    return NotFound(new { message = "Azure DevOps token not found" });
+                    return NotFound(new { message = "Token not found" });
                 }
 
-                return Ok(new AzureDevOpsTokenResponse { Token = token });
+                return Ok(new CloudProviderTokenResponse { Token = token });
             }
             catch (InvalidOperationException ex)
             {
@@ -71,7 +73,7 @@ namespace ReleaseManagerIdentityApi.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving Azure DevOps token" });
+                return StatusCode(500, new { message = "An error occurred while retrieving token" });
             }
         }
     }

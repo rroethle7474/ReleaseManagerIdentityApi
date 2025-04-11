@@ -17,6 +17,9 @@ namespace ReleaseManagerIdentityApi.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<OrganizationUser> OrganizationUsers { get; set; }
+        public DbSet<CloudProvider> CloudProviders { get; set; }
+        public DbSet<AuthMethod> AuthMethods { get; set; }
+        public DbSet<CloudOrganization> CloudOrganizations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +69,36 @@ namespace ReleaseManagerIdentityApi.Data
                 .WithMany()
                 .HasForeignKey(ou => ou.OrganizationId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CloudOrganization>()
+                .HasOne(co => co.Organization)
+                .WithMany()
+                .HasForeignKey(co => co.OrganizationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CloudOrganization>()
+                .HasOne(co => co.User)
+                .WithMany()
+                .HasForeignKey(co => co.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<CloudOrganization>()
+                .HasOne(co => co.CloudProvider)
+                .WithMany()
+                .HasForeignKey(co => co.CloudProviderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CloudOrganization>()
+                .HasOne(co => co.AuthMethod)
+                .WithMany()
+                .HasForeignKey(co => co.AuthMethodId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure unique constraint for CloudOrganization
+            modelBuilder.Entity<CloudOrganization>()
+                .HasIndex(co => new { co.UserId, co.ProviderIdentifier, co.CloudProviderId })
+                .IsUnique()
+                .HasFilter("[UserId] IS NOT NULL AND [ProviderIdentifier] IS NOT NULL");
         }
     }
 }

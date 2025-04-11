@@ -43,7 +43,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-builder.Services.AddScoped<IAzureDevOpsService, AzureDevOpsService>();
+builder.Services.AddScoped<ICloudProviderService, AzureDevOpsService>();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
