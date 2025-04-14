@@ -37,13 +37,14 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
+builder.Services.AddHttpClient();
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<AzureDevOpsService>();
+builder.Services.AddScoped<IEntraTokenExchangeService, EntraTokenExchangeService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-builder.Services.AddScoped<ICloudProviderService, AzureDevOpsService>();
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
