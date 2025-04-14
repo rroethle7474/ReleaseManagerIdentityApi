@@ -45,7 +45,8 @@ namespace ReleaseManagerIdentityApi.Services.DevOpsServices
             return token.TokenValue;
         }
 
-        public async Task StoreTokenAsync(Guid userId, int cloudProviderId, string token, DateTime expiresOn, int authMethodId)
+        public async Task StoreTokenAsync(Guid userId, int cloudProviderId, string token, 
+            DateTime expiresOn, int authMethodId, bool isEntraToken = false)
         {
             // Ensure we're dealing with Azure DevOps
             if (cloudProviderId != AZURE_DEVOPS_PROVIDER_ID)
@@ -54,7 +55,7 @@ namespace ReleaseManagerIdentityApi.Services.DevOpsServices
             }
 
             // Determine the correct token type based on auth method
-            string tokenTypeName = authMethodId == 1 ? "AzureDevOpsToken" : "OAuthRefreshToken";
+            string tokenTypeName = isEntraToken ? "EntraOAuthToken": (authMethodId == 1 ? "AzureDevOpsToken" : "OAuthRefreshToken");
 
             // Find the token type
             var tokenType = await _context.TokenTypes
