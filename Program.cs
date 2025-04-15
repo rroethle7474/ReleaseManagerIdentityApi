@@ -37,12 +37,19 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-builder.Services.AddHttpClient();
+
+// Register named HttpClient for EntraTokenExchangeService
+builder.Services.AddHttpClient("EntraTokenExchange", client =>
+{
+    client.BaseAddress = new Uri("https://login.microsoftonline.com/");
+});
+
 // Register Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<AzureDevOpsService>();
+builder.Services.AddScoped<ICloudProviderService, AzureDevOpsService>();
+//builder.Services.AddScoped<AzureDevOpsService>();
 builder.Services.AddScoped<IEntraTokenExchangeService, EntraTokenExchangeService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 

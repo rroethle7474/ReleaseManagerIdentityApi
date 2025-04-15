@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.DTOs.Responses;
 using ReleaseManagerIdentityApi.Models.Entities;
@@ -9,15 +9,15 @@ namespace ReleaseManagerIdentityApi.Services.Auth
 {
     public class EntraTokenExchangeService : IEntraTokenExchangeService
     {
-        private readonly AzureDevOpsService _azureDevOpsService;
-        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly ICloudProviderService _cloudProviderService;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
 
-        public EntraTokenExchangeService(AzureDevOpsService azureDevOpsService, HttpClient httpClient, IConfiguration configuration, ApplicationDbContext context)
+        public EntraTokenExchangeService(ICloudProviderService cloudProviderService, IHttpClientFactory httpClientFactory, IConfiguration configuration, ApplicationDbContext context)
         {
-            _azureDevOpsService = azureDevOpsService;
-            _httpClient = httpClient;
+            _cloudProviderService = cloudProviderService;
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _context = context;
         }
@@ -35,8 +35,9 @@ namespace ReleaseManagerIdentityApi.Services.Auth
             new KeyValuePair<string, string>("scope", "499b84ac-1321-427f-aa17-267ca6975798/.default")
         });
 
-            var response = await _httpClient.PostAsync(
-                $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token",
+            var httpClient = _httpClientFactory.CreateClient("EntraTokenExchange");
+            var response = await httpClient.PostAsync(
+                $"{tenantId}/oauth2/v2.0/token",
                 requestContent);
 
             response.EnsureSuccessStatusCode();
@@ -78,8 +79,9 @@ namespace ReleaseManagerIdentityApi.Services.Auth
         new KeyValuePair<string, string>("scope", "499b84ac-1321-427f-aa17-267ca6975798/.default")
     });
 
-            var response = await _httpClient.PostAsync(
-                $"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token",
+            var httpClient = _httpClientFactory.CreateClient("EntraTokenExchange");
+            var response = await httpClient.PostAsync(
+                $"{tenantId}/oauth2/v2.0/token",
                 requestContent);
 
             if (!response.IsSuccessStatusCode)
@@ -98,7 +100,7 @@ namespace ReleaseManagerIdentityApi.Services.Auth
         private async Task StoreEntraTokensAsync(Guid userId, int providerId, TokenResponse tokenResponse)
         {
             // Store access token
-            await _azureDevOpsService.StoreTokenAsync(
+            await _cloudProviderService.StoreTokenAsync(
                 userId,
                 providerId,
                 tokenResponse.AccessToken,
