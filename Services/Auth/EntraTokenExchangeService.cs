@@ -2,22 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Models.DTOs.Responses;
 using ReleaseManagerIdentityApi.Models.Entities;
+using ReleaseManagerIdentityApi.Services.Clients;
 using ReleaseManagerIdentityApi.Services.DevOpsServices;
-using System.Text.Json;
 
 namespace ReleaseManagerIdentityApi.Services.Auth
 {
     public class EntraTokenExchangeService : IEntraTokenExchangeService
     {
         private readonly ICloudProviderService _cloudProviderService;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IEntraTokenExchangeApiClient _entraTokenApiClient;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
 
-        public EntraTokenExchangeService(ICloudProviderService cloudProviderService, IHttpClientFactory httpClientFactory, IConfiguration configuration, ApplicationDbContext context)
+        public EntraTokenExchangeService(ICloudProviderService cloudProviderService, IEntraTokenExchangeApiClient entraTokenApiClient, IConfiguration configuration, ApplicationDbContext context)
         {
             _cloudProviderService = cloudProviderService;
-            _httpClientFactory = httpClientFactory;
+            _entraTokenApiClient = entraTokenApiClient;
             _configuration = configuration;
             _context = context;
         }
@@ -25,25 +25,7 @@ namespace ReleaseManagerIdentityApi.Services.Auth
         public async Task<TokenResponse> ExchangeCodeForTokenAsync(
             string code, string clientId, string clientSecret, string redirectUri, string tenantId)
         {
-            var requestContent = new FormUrlEncodedContent(new[]
-            {
-            new KeyValuePair<string, string>("client_id", clientId),
-            new KeyValuePair<string, string>("client_secret", clientSecret),
-            new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", redirectUri),
-            new KeyValuePair<string, string>("grant_type", "authorization_code"),
-            new KeyValuePair<string, string>("scope", "499b84ac-1321-427f-aa17-267ca6975798/.default")
-        });
-
-            var httpClient = _httpClientFactory.CreateClient("EntraTokenExchange");
-            var response = await httpClient.PostAsync(
-                $"{tenantId}/oauth2/v2.0/token",
-                requestContent);
-
-            response.EnsureSuccessStatusCode();
-
-            var responseContent = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TokenResponse>(responseContent);
+            return await _entraTokenApiClient.ExchangeCodeForTokenAsync(code, clientId, clientSecret, redirectUri, tenantId);
         }
 
         public async Task<CloudProviderTokenResponse> RefreshEntraTokenAsync(Guid userId, int providerId)
@@ -70,26 +52,7 @@ namespace ReleaseManagerIdentityApi.Services.Auth
             var clientSecret = _configuration["MicrosoftEntra:ClientSecret"];
             var tenantId = _configuration["MicrosoftEntra:TenantId"];
 
-            var requestContent = new FormUrlEncodedContent(new[]
-            {
-        new KeyValuePair<string, string>("client_id", clientId),
-        new KeyValuePair<string, string>("client_secret", clientSecret),
-        new KeyValuePair<string, string>("refresh_token", refreshToken.TokenValue),
-        new KeyValuePair<string, string>("grant_type", "refresh_token"),
-        new KeyValuePair<string, string>("scope", "499b84ac-1321-427f-aa17-267ca6975798/.default")
-    });
-
-            var httpClient = _httpClientFactory.CreateClient("EntraTokenExchange");
-            var response = await httpClient.PostAsync(
-                $"{tenantId}/oauth2/v2.0/token",
-                requestContent);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new InvalidOperationException("Failed to refresh token");
-            }
-
-            var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
+            var tokenResponse = await _entraTokenApiClient.RefreshTokenAsync(refreshToken.TokenValue, clientId, clientSecret, tenantId);
 
             // Store the new tokens
             await StoreEntraTokensAsync(userId, providerId, tokenResponse);

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReleaseManagerIdentityApi.Data;
 using ReleaseManagerIdentityApi.Services.Auth;
+using ReleaseManagerIdentityApi.Services.Clients;
 using ReleaseManagerIdentityApi.Services.DevOpsServices;
 using ReleaseManagerIdentityApi.Services.OrganizationService;
 using ReleaseManagerIdentityApi.Services.UserService;
@@ -38,9 +39,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Register named HttpClient for EntraTokenExchangeService
-builder.Services.AddHttpClient("EntraTokenExchange", client =>
+// Register the typed EntraTokenExchangeApiClient
+builder.Services.AddHttpClient<IEntraTokenExchangeApiClient, EntraTokenExchangeApiClient>(client =>
 {
+    // You can configure the base address or default headers here if needed
     client.BaseAddress = new Uri("https://login.microsoftonline.com/");
 });
 
